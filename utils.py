@@ -105,7 +105,7 @@ async def get_location():
     try:
       req_url = "http://ipinfo.io/loc"
       # a = requests.get(url)
-      async with aiohttp.ClientSession() as session:
+      async with aiohttp.ClientSession(trust_env=True) as session:
         async with session.get(req_url) as response:
           if response.status == 200:
               a = await response.text()
@@ -143,7 +143,7 @@ async def get_weather_openweathermap(api_key,lat,lon,city=None):
       if city is None:
           req_url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&appid={api_key}"
           # response = await requests.get(req_url)
-          async with aiohttp.ClientSession() as session:
+          async with aiohttp.ClientSession(trust_env=True) as session:
             async with session.get(req_url) as response:
               if response.status == 200:
                   response = await response.json()
