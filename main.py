@@ -32,7 +32,8 @@ def display_ip():
 async def update_time():
   while True:
     # now,tm_min,tm_sec = utils.get_datetime()
-    now = time.strftime('%H:%M:%S  %b %d')
+    # now = time.strftime('%H:%M:%S  %b %d')
+    now = time.strftime("%H:%M:%S  %a  %d/%m")
     a= time.perf_counter()
     utils.lcd_string(now,LCD_LINE_1)
     b= time.perf_counter()
@@ -44,6 +45,7 @@ async def update_weather(api_key):
   LOCATION = None
   now = time.strftime('%H:%M:%S  %b %d')
   print("Started updating weather",now)
+  LOCATION = await utils.get_location()
   # has_fetched = True
   try:
     while True:
@@ -63,13 +65,15 @@ async def update_weather(api_key):
 
       else:
         # now = time.strftime('%H:%M:%S  %b %d')
-        weather_data = await utils.get_weather_openweathermap(api_key,**LOCATION)
+        weather_data,city_name = await utils.get_weather_openweathermap(api_key,**LOCATION)
         print(now,"\t",weather_data)
         if weather_data == "No Weather data":
           LOCATION = await utils.get_location()
           if LOCATION is None:
             continue
         utils.lcd_string(weather_data,LCD_LINE_2)
+        if city_name:
+          utils.lcd_string(city_name,LCD_LINE_3)
         await asyncio.sleep(300)
         # sleep(300)
   except Exception as e:

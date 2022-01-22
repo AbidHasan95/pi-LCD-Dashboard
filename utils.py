@@ -6,7 +6,7 @@ import subprocess
 import aiohttp
 # Define some device parameters
 I2C_ADDR  = 0x27 # I2C device address
-LCD_WIDTH = 16   # Maximum characters per line
+LCD_WIDTH = 20   # Maximum characters per line
 
 # Define some device constants
 LCD_CHR = 1 # Mode - Sending data
@@ -78,6 +78,7 @@ def lcd_string(message,line):
 
 def get_datetime():
   now = time.strftime('%H:%M:%S  %b %d')
+  # now = time.strftime("%H:%M:%S  %a %d/%m")
   t =time.localtime()
   minute = t.tm_min
   sec = t.tm_sec
@@ -139,6 +140,7 @@ def get_weather_openweathermap_old(api_key,lat,lon,city=None):
 
 async def get_weather_openweathermap(api_key,lat,lon,city=None):
     res = "No Weather data"
+    city_name = None
     try:
       if city is None:
           req_url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&appid={api_key}"
@@ -148,12 +150,15 @@ async def get_weather_openweathermap(api_key,lat,lon,city=None):
               if response.status == 200:
                   response = await response.json()
                   temp_main = round(response["main"]["feels_like"])
-                  weather_main = response["weather"][0]["main"]
-                  res = f"{temp_main}ßC {weather_main}"[:16]
+                  # weather_main = response["weather"][0]["main"]
+                  weather_main = response["weather"][0]["description"]
+                  city_name = response["name"]
+                  res = f"{temp_main}ßC  {weather_main}"[:20]
+                  # res = "{}ßC {:>15}".format(temp_main,weather_main)[:20]
                   # print(res)
     except Exception as e:
       print(e)
-    return res
+    return res,city_name
 def get_weather_weathercom(api_key,lat,lon,city=None):
     res = "No Weather data"
     try:
